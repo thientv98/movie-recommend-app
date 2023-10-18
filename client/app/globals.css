@@ -2,249 +2,143 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap");
 
 body {
-  color: rgb(var(--foreground-rgb));
+  @apply bg-dark text-gray-lighten font-roboto;
+}
+
+/* to prevent horizontal scrolling in small viewport width, I need to set the property overflow-x-hidden on both the body and html element */
+
+/* for the property position: sticky used on this website to work properly, we need to reset the property overflow to its default value on big viewport width, by adding: md:overflow-x-visible (because position: sticky doesn't work as expected when descendant element (body, html) has property overflow set to hidden)*/
+
+body,
+:root {
+  @apply overflow-x-hidden md:overflow-x-visible;
+}
+
+/* CUSTOM UTILITIES */
+.tw-pagination-btn {
+  @apply inline-block h-8 w-8 bg-dark-lighten rounded-full tw-flex-center hover:bg-dark-lighten-2 transition duration-300;
+}
+
+.tw-flex-center {
+  @apply flex justify-center items-center;
+}
+
+.tw-absolute-center {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.tw-absolute-center-horizontal {
+  @apply absolute left-1/2 -translate-x-1/2;
+}
+
+.tw-absolute-center-vertical {
+  @apply absolute top-1/2 -translate-y-1/2;
+}
+
+.tw-black-backdrop {
+  background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.85) 65%);
+}
+
+.tw-black-backdrop-2 {
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    90deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(179, 179, 193, 0) 7%,
+    rgba(107, 107, 115, 0) 93%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
 }
 
-@layer base {
-  body {
-    @apply mx-auto h-full w-full max-w-[1440px] bg-app-dark-blue;
-  }
+.tw-black-backdrop-3 {
+  background: linear-gradient(65deg, rgba(39, 42, 55, 1) 70%, transparent 140%);
 }
 
-@layer components {
-  .heading-lg {
-    @apply text-app-heading-lg font-light;
-  }
-
-  .heading-md {
-    @apply text-app-heading-md font-light;
-  }
-
-  .heading-sm {
-    @apply text-app-heading-md font-medium;
-  }
-
-  .heading-xs {
-    @apply text-app-heading-xs font-medium;
-  }
-
-  .section-title {
-    @apply md:heading-lg text-xl font-light capitalize leading-none;
-  }
-
-  .icon-nav {
-    @apply fill-app-greyish-blue transition duration-150 ease-linear hover:fill-app-red md:h-5 md:w-5;
-  }
-
-  .active-link {
-    @apply fill-app-pure-white transition duration-150 ease-linear hover:fill-app-red md:h-5 md:w-5;
-  }
-
-  .disabled-link {
-    pointer-events: none;
-  }
-
-  /* Custom horizontal scroll for trending section */
-  .h-scroll::-webkit-scrollbar {
-    border-radius: 10px;
-    height: 8px;
-    width: 8px;
-  }
-  .h-scroll::-webkit-scrollbar-thumb:horizontal {
-    background: #5a698f; /* app-greyish-blue */
-    border-radius: 10px;
-  }
-
-  .card-collection-wrapper {
-    @apply flex flex-col items-center gap-4 sm:gap-x-7 sm:gap-y-6 xl:gap-x-10 xl:gap-y-8 2xs:flex-row 2xs:flex-wrap 2xs:justify-between;
-  }
-
-  .card-hover-animation {
-    @apply hover:animate-wiggle hover:even:animate-wiggle-opposite motion-reduce:transition-none motion-reduce:hover:transform-none;
-  }
-
-  /* Loading spinner */
-  /* Reference: https://codepen.io/ivillamil/pen/xxaEdB */
-  .loader {
-    animation: rotate 1s infinite;
-    height: 50px;
-    width: 50px;
-  }
-
-  .loader:before,
-  .loader:after {
-    border-radius: 50%;
-    content: "";
-    display: block;
-    height: 20px;
-    width: 20px;
-  }
-  .loader:before {
-    animation: ball1 1s infinite;
-    background-color: #cb2025;
-    box-shadow: 30px 0 0 #f8b334;
-    margin-bottom: 10px;
-  }
-  .loader:after {
-    animation: ball2 1s infinite;
-    background-color: #00a096;
-    box-shadow: 30px 0 0 #97bf0d;
-  }
-
-  @keyframes rotate {
-    0% {
-      -webkit-transform: -webkit-rotate(0deg) -webkit-scale(0.8);
-      -webkit-transform: rotate(0deg) scale(0.8);
-      -moz-transform: -webkit-rotate(0deg) scale(0.8);
-      transform: -webkit-rotate(0deg) scale(0.8);
-    }
-    50% {
-      -webkit-transform: -webkit-rotate(360deg) -webkit-scale(1.2);
-      -webkit-transform: rotate(360deg) scale(1.2);
-      -moz-transform: rotate(360deg) scale(1.2);
-      transform: rotate(360deg) scale(1.2);
-    }
-    100% {
-      -webkit-transform: -webkit-rotate(720deg) -webkit-scale(0.8);
-      -webkit-transform: rotate(720deg) scale(0.8);
-      -moz-transform: rotate(720deg) scale(0.8);
-      transform: rotate(720deg) scale(0.8);
-    }
-  }
-
-  @keyframes ball1 {
-    0% {
-      box-shadow: 30px 0 0 #f8b334;
-    }
-    50% {
-      box-shadow: 0 0 0 #f8b334;
-      margin-bottom: 0;
-      -webkit-transform: -webkit-translate(15px, 15px);
-      -webkit-transform: translate(15px, 15px);
-      -moz-transform: translate(15px, 15px);
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #f8b334;
-      margin-bottom: 10px;
-    }
-  }
-
-  @keyframes ball2 {
-    0% {
-      box-shadow: 30px 0 0 #97bf0d;
-    }
-    50% {
-      box-shadow: 0 0 0 #97bf0d;
-      margin-top: -20px;
-      -webkit-transform: -webkit-translate(15px, 15px);
-      -webkit-transform: translate(15px, 15px);
-      -moz-transform: translate(15px, 15px);
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #97bf0d;
-      margin-top: 0;
-    }
-  }
-}
-
-#nprogress {
-  pointer-events: none;
-}
-
-#nprogress .bar {
-  background: #fc4747;
-  position: fixed;
-  z-index: 1031;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 5px;
-}
-
-/* Fancy blur effect */
-#nprogress .peg {
-  display: block;
-  position: absolute;
-  right: 0px;
-  width: 100px;
-  height: 100%;
-  box-shadow: 0 0 10px #fc4747, 0 0 5px #fc4747;
-  opacity: 1;
-
-  -webkit-transform: rotate(3deg) translate(0px, -4px);
-  -ms-transform: rotate(3deg) translate(0px, -4px);
-  transform: rotate(3deg) translate(0px, -4px);
-}
-
-#nprogress .spinner {
-  display: block;
-  position: fixed;
-  z-index: 1031;
-  top: 15px;
-  right: 15px;
-}
-
-#nprogress .spinner-icon {
-  width: 18px;
-  height: 18px;
-  box-sizing: border-box;
-
-  border: solid 2px transparent;
-  border-top-color: #fc4747;
-  border-left-color: #fc4747;
-  border-radius: 50%;
-
-  -webkit-animation: nprogress-spinner 400ms linear infinite;
-  animation: nprogress-spinner 400ms linear infinite;
-}
-
-.nprogress-custom-parent {
+.tw-multiline-ellipsis-3 {
+  text-overflow: ellipsis;
   overflow: hidden;
-  position: relative;
+  white-space: normal;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
-.nprogress-custom-parent #nprogress .spinner,
-.nprogress-custom-parent #nprogress .bar {
-  position: absolute;
+.tw-multiline-ellipsis-2 {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: normal;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-/* @-webkit-keyframes nprogress-spinner {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
+/* CUSTOM SLIDER */
+:root {
+  --swiper-theme-color: white !important;
+  --swiper-navigation-size: 15px !important;
 }
-@keyframes nprogress-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-} */
+
+.tw-banner-slider .swiper-button-prev {
+  @apply !top-[6%] !left-[2%] !z-20 hidden sm:block;
+}
+
+.tw-banner-slider .swiper-button-next {
+  @apply !top-[6%] !left-[5%] !z-20 hidden sm:block;
+}
+
+.tw-section-slider .swiper-button-prev {
+  --swiper-navigation-size: 25px !important;
+  z-index: 20 !important;
+}
+
+.tw-section-slider .swiper-button-next {
+  --swiper-navigation-size: 25px !important;
+  z-index: 20 !important;
+}
+
+/* CUSTOM SCROLLBAR*/
+::-webkit-scrollbar {
+  @apply w-[10px];
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-button {
+  @apply hidden;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#121212] rounded-full hover:bg-[#0e0d0d] transition duration-300;
+}
+
+select:focus {
+  outline: none !important;
+}
+
+input {
+  @apply outline-none;
+}
+
+/* CUSTOM SLIDER RANGE */
+.tw-slider-range::-webkit-slider-thumb {
+  @apply appearance-none h-4 w-4 rounded-full bg-primary pointer-events-auto;
+}
+
+/* CUSTOM INPUT BACKGROUND WHEN AUTOFILL FORM */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #49494b inset !important;
+}
+
+/* CUSTOM SELECTION TEXT COLOR */
+::selection {
+  @apply text-black bg-primary;
+}

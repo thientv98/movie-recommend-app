@@ -1,16 +1,10 @@
-import Collection from '@/components/Collections'
-import SearchBar from '@/components/SearchBar'
-import Head from 'next/head'
+"use client"
+import MainHomeFilms from '@/components/home/MainHomeFilms';
 
 export default function Home() {
   return (
     <>
-      <Head>
-        <title>Home | Watcho</title>
-      </Head>
-      <SearchBar />
-
-      <Collection />
+      <MainHomeFilms />
     </>
   )
 }
