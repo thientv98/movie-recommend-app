@@ -13,7 +13,13 @@ import {
     ApolloServerPluginLandingPageProductionDefault,
 } from "apollo-server-core";
 
+import * as dotenv from 'dotenv'
+import Context from "./types/context";
+import { verifyJwt } from "./utils/jwt";
+import { User } from "./types/user";
+
 async function startServer() {
+    dotenv.config()
     const app = express();
 
     const schema = await buildSchema({
@@ -22,6 +28,15 @@ async function startServer() {
 
     const server = new ApolloServer({
         schema,
+        context: (ctx: Context) => {
+            const context = ctx;
+
+            if (ctx.req?.cookies?.accessToken) {
+                const user = verifyJwt<User>(ctx.req.cookies.accessToken);
+                context.user = user;
+            }
+            return context;
+        },
     });
 
     await connectDB();

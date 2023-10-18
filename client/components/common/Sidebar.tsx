@@ -1,8 +1,8 @@
 "use client"
 import { useCurrentViewportView } from "@/hooks/useCurrentViewportView";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { FC, useState } from "react";
+import { usePathname } from "next/navigation";
+import { FC } from "react";
 import { AiOutlineHome, AiOutlineLogin, AiOutlineLogout, AiOutlineSearch, AiOutlineUser } from "react-icons/ai";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
@@ -81,7 +81,7 @@ const Sidebar: FC<SidebarProps> = ({ isSidebarActive, onCloseSidebar }) => {
           </Link>
 
           <Link
-            href="/"
+            href="/auth"
             className="flex gap-5 items-center"
           >
             <AiOutlineLogin size={30} />

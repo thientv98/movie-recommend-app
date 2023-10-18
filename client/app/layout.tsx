@@ -14,6 +14,9 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Sidebar from '@/components/common/Sidebar';
 import { useState } from 'react';
+import { SessionProvider } from 'next-auth/react';
+import { ApolloNextAppProvider } from '@apollo/experimental-nextjs-app-support/ssr';
+import { makeClient } from '@/lib/apollo-provider';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -72,7 +75,11 @@ export default function RootLayout({
               </div>
             </div>
 
-            {children}
+            <ApolloNextAppProvider makeClient={makeClient}>
+              <SessionProvider refetchInterval={5 * 60}>
+                {children}
+              </SessionProvider>
+            </ApolloNextAppProvider>
           </div>
         </div>
 
