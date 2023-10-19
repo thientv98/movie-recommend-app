@@ -35,7 +35,7 @@ const FilmItem: FunctionComponent<FilmItemProps> = ({ movie }) => {
                 {movie.title}
               </p>
               <div className="bg-primary px-2 py-1 rounded-full absolute top-[5%] left-[8%] z-20 flex items-center gap-1 text-white text-xs">
-                8.7
+                {movie.vote_average / 10}
                 <AiFillStar size={15} />
               </div>
             </>

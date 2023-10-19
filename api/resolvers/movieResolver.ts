@@ -137,7 +137,7 @@ export class MovieResolver {
                     overview: item.overview,
                     popularity: stringToNumber(item.popularity),
                     release_date: item.release_date,
-                    vote_average: stringToNumber(item.vote_average),
+                    vote_average: item.vote_average,
                     vote_count: stringToNumber(item.vote_count),
                     genres: genresIds,
                     actors: castIds,
