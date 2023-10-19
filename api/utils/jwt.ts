@@ -14,3 +14,13 @@ export function verifyJwt<T>(token: string): T | null {
         return null;
     }
 }
+
+export const getToken = (authorization: string) => {
+    if (
+        authorization &&
+        authorization.split(" ")[0] === "Bearer"
+    ) {
+        return authorization.split(" ")[1];
+    }
+    return null;
+}

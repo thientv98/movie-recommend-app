@@ -1,5 +1,6 @@
-import { CREATE_USER } from "@/query/user.query";
-import { useMutation } from "@apollo/client";
+import { USER_LOGIN, USER_ME } from "@/grapql/user.query";
+import { client } from "@/lib/client";
+import { ApolloClient, HttpLink, InMemoryCache, gql, useMutation } from "@apollo/client";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -13,38 +14,21 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const res = await fetch(process.env.API_URL + "/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: credentials?.email,
-            password: credentials?.password,
-          }),
+        const { data: dataLogin } = await client.mutate({
+          mutation: USER_LOGIN,
+          variables: {
+            loginInput: {
+              email: credentials?.email,
+              password: credentials?.password,
+            },
+          }
         });
 
-        const userTokens = await res.json();
-
-        if (userTokens.data.token) {
-          const res = await fetch(process.env.API_URL + "/auth/me", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userTokens.data.token}`,
-            },
-          });
-
-          const userData = await res.json();
-
-          const user = {
-            ...userData.data,
-            accessToken: userTokens.data.token,
-          };
-          return user;
-        } else {
-          return null;
+        if (dataLogin.login) {
+          return dataLogin.login
         }
+
+        return null
       },
     }),
   ],
@@ -60,8 +44,6 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }: any) {
-      console.log("refetch");
-
       session.user = {
         ...session.user,
         ...token,

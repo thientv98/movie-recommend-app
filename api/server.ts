@@ -12,10 +12,9 @@ import {
     ApolloServerPluginLandingPageGraphQLPlayground,
     ApolloServerPluginLandingPageProductionDefault,
 } from "apollo-server-core";
-
 import * as dotenv from 'dotenv'
 import Context from "./types/context";
-import { verifyJwt } from "./utils/jwt";
+import { getToken, verifyJwt } from "./utils/jwt";
 import { User } from "./types/user";
 
 async function startServer() {
@@ -30,9 +29,13 @@ async function startServer() {
         schema,
         context: (ctx: Context) => {
             const context = ctx;
+            const token = getToken(ctx.req.headers?.authorization || '')
+            console.log(token);
 
-            if (ctx.req?.cookies?.accessToken) {
-                const user = verifyJwt<User>(ctx.req.cookies.accessToken);
+            if (token) {
+                const user = verifyJwt<User>(token);
+                console.log(user);
+
                 context.user = user;
             }
             return context;

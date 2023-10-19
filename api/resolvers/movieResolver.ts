@@ -3,6 +3,10 @@ import { CreateMovieInput, Movie } from '../types/movie';
 import MovieModel from '../models/movieModel';
 import MovieService from '../services/movie.service';
 import UserActivityModel from '../models/userActivityModel';
+import axios from 'axios';
+import GenreModel from '../models/genreModel';
+import ActorModel from '../models/actorModel';
+import { stringToNumber } from '../utils';
 
 @Resolver(Movie)
 export class MovieResolver {
@@ -76,5 +80,79 @@ export class MovieResolver {
         }
 
         return recommendedMovies;
+    }
+
+    @Query(() => [String])
+    async crawl(@Arg("page") page: Number) {
+        const url = `https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=${page}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZDVjYzliNWJiOGYyZjY5ZDMwNjMzMzBmZjk3ZDY4ZCIsInN1YiI6IjY1MmExNDRhMWYzZTYwMDBjNTg4ZTg2OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.x060wMTTnSzyJppQ8ecb0NTTlowsxx8mYvZzuCocm4Q'
+            }
+        };
+        const done = []
+
+        const movieData = await axios(url, options);
+        movieData.data.results.map(async (item: any) => {
+            // get movie detail
+            const movieDetail = await axios(`https://api.themoviedb.org/3/movie/${item.id}?language=en-US`, options);
+
+            const genresIds: any = [];
+            for await (const genre of movieDetail.data.genres) {
+                const find = await GenreModel.findOne({ name: genre.name }).lean()
+                if (find) {
+                    genresIds.push(find._id)
+                } else {
+                    const newGenre = await GenreModel.create({
+                        name: genre.name
+                    })
+                    genresIds.push(newGenre._id)
+                }
+            }
+
+            const credits = await axios(`https://api.themoviedb.org/3/movie/299054/credits?language=en-US`, options)
+            const castIds: any = []
+            for await (const cast of credits.data.cast) {
+                const find = await ActorModel.findOne({ name: cast.name }).lean()
+                if (find) {
+                    castIds.push(find._id)
+                } else {
+                    const newItem = await ActorModel.create({
+                        name: cast.name,
+                        avatar: cast.profile_path,
+                    })
+                    castIds.push(newItem._id)
+                }
+            }
+
+            const movie = await MovieModel.findOne({ title: item.title }).lean()
+            if (!movie) {
+                console.log('create movie', item.id);
+
+                // create movie
+                MovieModel.create({
+                    title: item.title,
+                    overview: item.overview,
+                    popularity: stringToNumber(item.popularity),
+                    release_date: item.release_date,
+                    vote_average: stringToNumber(item.vote_average),
+                    vote_count: stringToNumber(item.vote_count),
+                    genres: genresIds,
+                    actors: castIds,
+                    thumbnail: item.poster_path,
+                    backdrop: item.backdrop_path,
+                    time: stringToNumber(item.runtime)
+                })
+            }
+            done.push(item.id)
+
+            if (done.length == movieData.data.results.length) {
+                console.log('done');
+            }
+        })
+
+        return "OK";
     }
 }

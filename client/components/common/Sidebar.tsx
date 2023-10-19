@@ -5,15 +5,20 @@ import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { AiOutlineHome, AiOutlineLogin, AiOutlineLogout, AiOutlineSearch, AiOutlineUser } from "react-icons/ai";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-
+import { useSession, signOut } from "next-auth/react";
 interface SidebarProps {
   isSidebarActive: boolean;
   onCloseSidebar: () => void;
 }
 
 const Sidebar: FC<SidebarProps> = ({ isSidebarActive, onCloseSidebar }) => {
+  const { data: session } = useSession();
   const { isMobile } = useCurrentViewportView();
   const pathname = usePathname()
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/" });
+  }
 
   return (
     <>
@@ -70,32 +75,39 @@ const Sidebar: FC<SidebarProps> = ({ isSidebarActive, onCloseSidebar }) => {
 
         <div className="text-white text-lg font-medium mt-12">GENERAL</div>
         <div className="mt-8 ml-4 flex flex-col gap-6">
-          <Link
-            href="/profile"
-            className={`flex gap-6 items-center  ${pathname === "/profile" &&
-              "!text-primary border-r-4 border-primary font-medium"
-              } hover:text-white transition duration-300`}
-          >
-            <AiOutlineUser size={25} />
-            <p>Profile</p>
-          </Link>
+          {session && session.user &&
+            <>
+              <Link
+                href="/"
+                className={`flex gap-6 items-center  ${pathname === "/profile" &&
+                  "!text-primary border-r-4 border-primary font-medium"
+                  } hover:text-white transition duration-300`}
+              >
+                <AiOutlineUser size={25} />
+                <p>Profile</p>
+              </Link>
 
-          <Link
-            href="/auth"
-            className="flex gap-5 items-center"
-          >
-            <AiOutlineLogin size={30} />
-            <p>Login</p>
-          </Link>
+              <button
+                onClick={handleLogout}
+                className="flex gap-5 items-center"
+              >
+                <AiOutlineLogout size={30} />
+                <p>Logout</p>
+              </button>
+            </>
+          }
 
-          <button
-            className="flex gap-5 items-center"
-          >
-            <AiOutlineLogout size={30} />
-            <p>Logout</p>
-          </button>
+          {!session &&
+            <Link
+              href="/auth"
+              className="flex gap-5 items-center"
+            >
+              <AiOutlineLogin size={30} />
+              <p>Login</p>
+            </Link>
+          }
         </div>
-      </div>
+      </div >
       <div
         onClick={onCloseSidebar}
         className={`bg-black/60 z-[5] fixed top-0 left-0 w-full h-full md:opacity-0 transition duration-300 ${isSidebarActive ? "opacity-100 visible" : "opacity-0 invisible"

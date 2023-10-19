@@ -21,6 +21,27 @@ export class User {
     avatar: string;
 }
 
+@ObjectType()
+export class UserLogin {
+    @Field()
+    accessToken: string;
+
+    @Field((type) => ID)
+    _id: string;
+
+    @Field()
+    name: string;
+
+    @Field()
+    email: string;
+
+    @Field()
+    password: string;
+
+    @Field(() => String, { nullable: true })
+    avatar: string;
+}
+
 @InputType()
 export class CreateUserInput {
     @IsString()

@@ -34,6 +34,12 @@ export class Movie {
 
     @Field()
     thumbnail: string;
+
+    @Field()
+    backdrop: string;
+
+    @Field()
+    time: number;
 }
 
 @InputType()
