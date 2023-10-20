@@ -9,7 +9,7 @@ export class Actor {
     @Field()
     name: string;
 
-    @Field()
+    @Field(() => String, { nullable: true })
     avatar: string;
 }
 

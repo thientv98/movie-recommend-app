@@ -11,8 +11,6 @@ interface FilmItemProps {
 const FilmItem: FunctionComponent<FilmItemProps> = ({ movie }) => {
   const [showSkeleton, setShowSkeleton] = useState(true)
   const onLoadedImage = () => {
-    console.log(123);
-
     setShowSkeleton(false)
   }
   return (
@@ -35,7 +33,7 @@ const FilmItem: FunctionComponent<FilmItemProps> = ({ movie }) => {
                 {movie.title}
               </p>
               <div className="bg-primary px-2 py-1 rounded-full absolute top-[5%] left-[8%] z-20 flex items-center gap-1 text-white text-xs">
-                {movie.vote_average / 10}
+                {movie.vote_average}
                 <AiFillStar size={15} />
               </div>
             </>

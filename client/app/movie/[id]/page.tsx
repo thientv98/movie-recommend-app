@@ -2,23 +2,39 @@
 
 import Skeleton from "@/components/common/Skeleton";
 import FilmTabInfo from "@/components/film/FilmTabInfo";
+import { MOVIE_DETAIL } from "@/grapql/movie.query";
 import { useCurrentViewportView } from "@/hooks/useCurrentViewportView";
+import { useSuspenseQuery } from "@apollo/client";
 import Link from "next/link";
 import { useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { AiFillHeart, AiFillPlayCircle, AiOutlineDotChart, AiOutlineShareAlt } from "react-icons/ai";
 import { LazyLoadImage } from "react-lazy-load-image-component"
 
-export default function Home() {
+export default function MovieDetail({
+  params,
+}: {
+  params: { id: string };
+}) {
   const { isMobile } = useCurrentViewportView();
   const [isBookmarked, setIsBookmarked] = useState(false)
+
+  const { data }: any = useSuspenseQuery(MOVIE_DETAIL, {
+    variables: { id: params.id },
+  });
+
+  const movie = data.getMovie
+
+  console.log(movie);
+
+
   return (
     <>
       <div className="flex-grow min-h-screen mt-5">
         {/* BACKDROP AND GENERAL INFORMATION */}
         <div
           style={{
-            backgroundImage: `url("https://image.tmdb.org/t/p/original/cHNqobjzfLj88lpIYqkZpecwQEC.jpg")`,
+            backgroundImage: `url("https://image.tmdb.org/t/p/original${movie?.backdrop}")`,
           }}
           className="bg-cover bg-center bg-no-repeat md:h-[400px] h-[300px] rounded-bl-2xl relative"
         >
@@ -28,7 +44,7 @@ export default function Home() {
               <div className="flex gap-5 items-center">
                 <div className="shrink-0 w-[185px] ml-3 md:ml-0">
                   <LazyLoadImage
-                    src="https://image.tmdb.org/t/p/w185/b0Ej6fnXAP8fK75hlyi2jKqdhHz.jpg"
+                    src={`https://image.tmdb.org/t/p/w185${movie.thumbnail}`}
                     effect="opacity"
                     className="w-full h-full object-cover rounded-md"
                     alt="Poster"
@@ -49,18 +65,21 @@ export default function Home() {
               <div className="flex-grow md:ml-14 ml-6 mt-6 md:mt-0">
                 <div className="md:h-28 flex items-end">
                   <h1 className=" text-white text-[45px] font-bold leading-tight">
-                    name
+                    {movie?.title}
                   </h1>
                 </div>
                 <ul className="flex gap-3 flex-wrap md:mt-7 mt-3">
-                  <li className="mb-3">
-                    <Link
-                      href='/genre/1'
-                      className="md:px-5 px-3 md:py-2 py-1 rounded-full uppercase font-medium border border-gray-300 md:text-white hover:brightness-75 transition duration-300"
-                    >
-                      Action
-                    </Link>
-                  </li>
+                  {movie?.genres && movie.genres.map((item: any) => (
+                    <li className="mb-3" key={item._id}>
+                      <Link
+                        href='/'
+                        className="md:px-5 px-3 md:py-2 py-1 rounded-full uppercase font-medium border border-gray-300 md:text-white hover:brightness-75 transition duration-300"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+
                 </ul>
               </div>
 
@@ -111,9 +130,9 @@ export default function Home() {
                 {!isMobile && (
                   <div className="w-16">
                     <CircularProgressbar
-                      value={8.7}
+                      value={movie?.vote_average ?? 0}
                       maxValue={10}
-                      text={`8.7`}
+                      text={movie?.vote_average ?? 0}
                       styles={buildStyles({
                         textSize: "25px",
                         pathColor: `rgba(81, 121, 255, 87)`,
@@ -126,7 +145,7 @@ export default function Home() {
                 )}
                 {isMobile && (
                   <p className="text-2xl -mt-3">
-                    8.7
+                    {movie?.vote_average ?? 0}
                   </p>
                 )}
               </div>
@@ -139,7 +158,7 @@ export default function Home() {
                     </p>
                     <div className="flex gap-2 items-center">
                       <p className="text-2xl">
-                        109
+                        {movie?.time ?? 0}
                       </p>
                       <span>min</span>
                     </div>
@@ -156,7 +175,7 @@ export default function Home() {
           )}
 
           <div className="flex-grow min-h-[500px] md:border-r border-dark-lighten md:px-16 px-5 md:py-7 pt-40">
-            <FilmTabInfo />
+            <FilmTabInfo movie={movie} />
           </div>
         </div>
       </div>

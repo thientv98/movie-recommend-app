@@ -22,7 +22,6 @@ const MainHomeFilms: FC<MainHomeFilmsProps> = () => {
       <ul className="grid grid-cols-sm lg:grid-cols-lg gap-x-8 gap-y-10 pt-2 px-2">
         {data?.getMovies.map((movie: any) => (
           <li key={movie._id}>
-            {/* <Skeleton className="h-0 pb-[160%]" /> */}
             <FilmItem movie={movie} />
           </li>
         ))

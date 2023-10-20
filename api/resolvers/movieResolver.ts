@@ -16,19 +16,12 @@ export class MovieResolver {
 
     @Query(() => Movie)
     async getMovie(@Arg('id') id: string) {
-        const movie = await MovieModel.findById(id);
-        if (!movie) throw new Error('Movie not found');
-        return movie;
-    }
-
-    @Query(() => [Movie])
-    async getAllMovies() {
-        return MovieModel.find();
+        return this.movieService.findMovie(id);
     }
 
     @Query(() => [Movie])
     async getMovies() {
-        return this.movieService.findMovies();
+        return this.movieService.getMovies();
     }
 
     // @Authorized()
@@ -95,7 +88,7 @@ export class MovieResolver {
         const done = []
 
         const movieData = await axios(url, options);
-        movieData.data.results.map(async (item: any) => {
+        for await (const item of movieData.data.results) {
             // get movie detail
             const movieDetail = await axios(`https://api.themoviedb.org/3/movie/${item.id}?language=en-US`, options);
 
@@ -133,17 +126,17 @@ export class MovieResolver {
 
                 // create movie
                 MovieModel.create({
-                    title: item.title,
-                    overview: item.overview,
-                    popularity: stringToNumber(item.popularity),
-                    release_date: item.release_date,
-                    vote_average: item.vote_average,
-                    vote_count: stringToNumber(item.vote_count),
+                    title: movieDetail.data.title,
+                    overview: movieDetail.data.overview,
+                    popularity: stringToNumber(movieDetail.data.popularity),
+                    release_date: movieDetail.data.release_date,
+                    vote_average: movieDetail.data.vote_average,
+                    vote_count: stringToNumber(movieDetail.data.vote_count),
                     genres: genresIds,
                     actors: castIds,
-                    thumbnail: item.poster_path,
-                    backdrop: item.backdrop_path,
-                    time: stringToNumber(item.runtime)
+                    thumbnail: movieDetail.data.poster_path,
+                    backdrop: movieDetail.data.backdrop_path,
+                    time: movieDetail.data.runtime ? Number(movieDetail.data.runtime) : 0
                 })
             }
             done.push(item.id)
@@ -151,7 +144,7 @@ export class MovieResolver {
             if (done.length == movieData.data.results.length) {
                 console.log('done');
             }
-        })
+        }
 
         return "OK";
     }
